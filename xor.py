@@ -1,29 +1,38 @@
+import struct
+
 def sub_0(passed_in):
-    hex_key = 0x6F9CAEA4
-    hex_key_bytes = hex_key.to_bytes(4, 'little')  # Convert to bytes assuming little-endian
+    assert len(passed_in) == 16, "Input must be a 16-byte string"
 
-    # Convert passed_in into bytes and slice off the last half
-    passed_in_bytes = passed_in.to_bytes(16, 'little')[:8]  
+    # Convert passed_in to an array of bytes
+    pass_in = bytearray(passed_in)
 
-    # Determine the length of passed_in_bytes
-    length = int.from_bytes(passed_in_bytes[:8], 'little')
+    # Define our 4-byte XOR key as an array of bytes
+    hex_address = bytearray(struct.pack("I", 0x6F9CAEA4)) # 'I' is for unsigned int
 
-    # Initialize the_pass_in_value as a bytearray for mutable operations
-    the_pass_in_value = bytearray(passed_in_bytes)
+    # Extract the least significant 8 bytes (as a little-endian 'q') and use it as an offset
+    offset = struct.unpack_from('<q', passed_in)[0]
 
-    # Perform XOR operation
-    for i in range(length):
-        for j in range(4):
-            the_pass_in_value[i] ^= hex_key_bytes[j]
+    # Calculate the start and end points of the range of bytes to be processed
+    start = 8
+    end = start + offset
 
-    # Convert back to int and return
-    result = int.from_bytes(the_pass_in_value, 'little')
-    return result
+    # Loop over each byte in the range
+    for i in range(start, end):
+        # XOR the byte with each byte in hex_address, and update the byte in pass_in
+        for j in range(4): # 4 bytes in hex_address
+            pass_in[i] ^= hex_address[j]
 
+    # Return the byte array
+    return pass_in
 
+# Here is your input:
+input_hex = "9f95989ec4c09d9f9a9f9ccaca9ad49fcf9ac8d4cdc9cdccd49b989acad4caca0cecec9caca9fcfc89a"
+input_bytes = bytes.fromhex(input_hex)  
+ # Remove spaces and convert to bytes
 
-hex_input = 0x9f95989ec4c09d9f9a9f9ccaa9ad49fcf9ac8d4cdc9cdccd49b989acd4cacad0cecec9cac99fcfc89a
-#key = "4321"
+# We apply the function to each 16-byte block of the input:
+blocks = [input_bytes[i:i+16] for i in range(0, len(input_bytes), 16)]
+output_bytes = b''.join(sub_0(block) for block in blocks)
 
-encrypted = sub_0(hex_input)
-print("Encrypted: ", encrypted)
+# Print the result as a hex string:
+print(output_bytes.hex())
