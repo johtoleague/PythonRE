@@ -1,5 +1,5 @@
 
-def merge(s, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+def merge(nums1:list[int], m: int, nums2: list[int], n: int) -> None:
     p1 = m - 1 # gives len of list 1
     p2 = n - 1 # gives leng of list 2
     p = m + n - 1 #len of combined list
