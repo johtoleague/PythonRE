@@ -6,7 +6,7 @@ def defang(ip : str) -> str:
         if ch == ".":
             ans += "[.]"
         else:
-            ans += ch
+            ans += #ch
     return ans
 
 
